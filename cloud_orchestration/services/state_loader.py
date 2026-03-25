@@ -24,7 +24,8 @@ class StateLoader:
             "schedule": "month_1_operational_schedule.md",
             "framework": "unified_operational_framework_v5.0.md",
             "summary": "analytical-session-summary.md",
-            "protocol": "INSTITUTIONAL_WORK_PROTOCOL_v5.0.md"
+            "protocol": "INSTITUTIONAL_WORK_PROTOCOL_v5.0.md",
+            "brief": "master-intelligence-brief.md"
         }
         
         docs_content = {}
