@@ -1,4 +1,4 @@
-twelve-data
+twelvedata
 python-telegram-bot
 supabase
 fastapi
