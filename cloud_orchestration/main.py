@@ -3,7 +3,6 @@ import datetime
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
-from mangum import Mangum
 
 from services.risk_manager import RiskManager
 from services.execution import ExecutionSpecialist
@@ -14,7 +13,6 @@ from integrations.telegram_bot import TelegramIntegration
 from integrations.twelve_data import TwelveDataIntegration
 
 app = FastAPI(title="Antigravity Sovereign Cloud")
-handler = Mangum(app)
 
 # Initialize components
 risk_manager = RiskManager()
