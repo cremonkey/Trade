@@ -30,7 +30,12 @@ class TwelveDataIntegration:
             response = await client.get(f"{self.base_url}/price", params=params)
             if response.status_code == 200:
                 data = response.json()
-                return float(data.get("price", 0.0))
+                price = data.get("price")
+                if price is not None:
+                    return float(price)
+                else:
+                    print(f"[TwelveData] Error for {symbol}: {data}")
+                    return 0.0
         return None
 
     async def get_market_data(self) -> Dict[str, Optional[float]]:
