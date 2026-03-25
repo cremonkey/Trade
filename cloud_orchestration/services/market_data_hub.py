@@ -1,3 +1,7 @@
+from datetime import datetime
+from typing import Dict, Optional
+from datetime import datetime
+from typing import Dict, Optional
 from integrations.yahoo_finance import YahooFinanceIntegration
 from integrations.twelve_data import TwelveDataIntegration
 from integrations.oanda_api import OandaSpotPrices
