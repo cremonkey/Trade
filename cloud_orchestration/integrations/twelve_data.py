@@ -40,10 +40,15 @@ class TwelveDataIntegration:
 
     async def get_market_data(self) -> Dict[str, Optional[float]]:
         """
-        Consolidated fetch for XAU/USD, DXY, and XAG/USD.
+        Consolidated fetch for XAU/USD and DXY (Free Tier Optimized).
         """
-        symbols = ["XAU/USD", "DXY", "XAG/USD"]
+        # Note: XAG/USD is excluded as it requires a paid Twelve Data plan.
+        # DXY symbol in Twelve Data is often 'DXY' or 'DX-Y.NYB'
+        symbols = ["XAU/USD", "DXY"] 
         results = {}
         for symbol in symbols:
-            results[symbol] = await self.get_price(symbol)
+            try:
+                results[symbol] = await self.get_price(symbol)
+            except Exception:
+                results[symbol] = 0.0
         return results

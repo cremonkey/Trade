@@ -38,7 +38,7 @@ class GeminiIntelligence:
             
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(
-            model_name="gemini-pro",
+            model_name="gemini-1.5-pro",
             system_instruction=self.SYSTEM_PROMPT + "\n\nKNOWLEDGE BASE CONTEXT:\n" + self.knowledge_base
         )
 
