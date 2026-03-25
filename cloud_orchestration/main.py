@@ -11,6 +11,8 @@ from services.gemini_intelligence import GeminiIntelligence
 from integrations.supabase_client import SupabaseIntegration
 from integrations.telegram_bot import TelegramIntegration
 from integrations.yahoo_finance import YahooFinanceIntegration
+from services.market_data_hub import MarketDataHub
+from integrations.telegram_bot import TelegramIntegration
 from services.session_manager import SessionManager
 from services.state_loader import StateLoader
 from services.news_radar import NewsRadar
@@ -24,7 +26,7 @@ news_analyst = NewsAnalyst()
 brain = GeminiIntelligence()
 supabase = SupabaseIntegration()
 telegram = TelegramIntegration()
-market_data = YahooFinanceIntegration()
+market_hub = MarketDataHub()
 session_manager = SessionManager()
 state_loader = StateLoader()
 news_radar = NewsRadar()
