@@ -57,7 +57,7 @@ async def get_status():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/analyze")
+@app.get("/analyze")
 async def trigger_analysis(background_tasks: BackgroundTasks):
     """
     Triggers the full 5-script analysis suite.
