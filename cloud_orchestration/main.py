@@ -107,19 +107,9 @@ async def run_analysis_cycle():
     ai_decision = await brain.analyze_market(analysis_context, "N/A")
     print(f"[{datetime.now()}] Institutional Decision: {ai_decision}")
     
-    # 5. Push Alerts (Arabic & Detailed)
+    # 5. Push Alerts (Style-Matched Position Defense Report)
     if gold_price:
-        status_emoji = "🛡️ تنفيذ سيادي (EXECUTE)" if ai_decision.get("execute") else "⏳ مراقبة (MONITORING)"
-        sent = await telegram.send_alert(
-            f"🏛️ **القرار المؤسسي**: {status_emoji}\n"
-            f"--- \n"
-            f"📈 المرحلة: {sovereign_state.get('phase')}\n"
-            f"🌍 الجلسة: {current_session}\n"
-            f"💰 سعر الذهب مباشر: ${gold_price}\n"
-            f"🎯 الاتجاه: {ai_decision.get('bias', 'NEUTRAL')}\n"
-            f"⚖️ تقييم التقارب (FTCS): {ai_decision.get('ftcs_score', 0)}\n"
-            f"\n📜 **التحليل التفصيلي**:\n{ai_decision.get('reasoning', 'N/A')}"
-        )
+        sent = await telegram.send_alert(ai_decision.get('reasoning', 'N/A'))
         print(f"[{datetime.now()}] Telegram Alert Sent: {sent}")
     else:
         print(f"[{datetime.now()}] Skipping Telegram Alert: No Gold Price found.")

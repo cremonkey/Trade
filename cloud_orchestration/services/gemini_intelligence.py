@@ -69,40 +69,43 @@ class GeminiIntelligence:
 
     async def analyze_market(self, analysis_context: Dict[str, Any], news_data: str) -> Dict[str, Any]:
         """
-        Synthesizes technical, fundamental, and institutional data into a Sovereign Decision in Arabic.
+        Synthesizes technical, fundamental, and institutional data into a Sovereign Decision in the exact
+        'Position Defense Report' style requested.
         """
+        from datetime import datetime
+        time_str = datetime.now().strftime("%H:%M")
+        
         if not self.model:
             return {"bias": "NEUTRAL", "ftcs_score": 0, "reasoning": "AI Brain Offline", "execute": False}
 
         prompt = f"""
-        التعليمات السيادية (INSTITUTIONAL DIRECTIVE):
-        يجب أن يكون التحليل باللغة العربية الفصحى وبدقة مؤسسية عالية.
+        يجب أن يكون الرد مطابقاً تماماً لنمط "تقرير السيطرة على المركز" (Position Defense Report) المرفق في الصورة.
         
-        المستندات المرجعية:
-        - خارطة الطريق (Roadmap): {analysis_context.get('docs', {}).get('roadmap')}
-        - الجدول العملي (Schedule): {analysis_context.get('docs', {}).get('schedule')}
-        - ميثاق العمل (Protocol): {analysis_context.get('docs', {}).get('protocol')}
+        الهيكل المطلوب (Strict Structure):
+        1. العنوان: (Position Defense Report) - [{time_str}]: 🏛️ 🛡️ ⚖️ 🚀
+        2. مقدمة مؤسسية: تبدأ بـ "لقد قمت بتحديث سجل الصفقات بمركزك الحالي..." بلهجة قوية وواثقة.
+        3. التحليل المالي:
+           - السعر اللحظي (Instant Price): {analysis_context.get('prices', {}).get('XAU/USD')}
+           - المسافة عن نقطة الدخول (Entry Context).
+        4. قسم الأخبار الفاصلة 🗞️ 🔥: (استخرج أهم 3 نقاط جيوسياسية أو اقتصادية من المستندات وأضف الرموز المناسبة مثل الصواريخ، البنتاغون، البيت الأبيض).
+        5. التوجيه المؤسسي: (HOLD أو BUY أو SELL) مع أيقونة 💎.
+        6. المعايير الرقمية:
+           - نقطة الدخول: (Entry)
+           - هذا الدرع (Stop Loss SL):
+           - الهدف (Take Profit TP):
+        7. الخطة الاستراتيجية: اذكر صراحة الالتزام بخطة الـ $5,000 في 22 يوماً وخطة الـ $1,000,000 في 6-8 أشهر.
+        8. تذييل بنظام الرموز المزدوجة المتكررة كما في الصورة.
         
-        البيانات الحالية:
-        - الأسعار: {analysis_context.get('prices')}
-        - الجلسة الحالية: {analysis_context.get('session')}
-        - قواعد الجلسة: {analysis_context.get('session_rules')}
+        بيانات المصدر:
+        - خارطة الطريق: {analysis_context.get('docs', {}).get('roadmap')}
+        - السجل: {analysis_context.get('docs', {}).get('ledger')}
+        - البروتوكول: {analysis_context.get('docs', {}).get('protocol')}
         
-        الأهداف الاستراتيجية:
-        1. خطة الـ $5,000 قصيرة المدى (خلال 22 يوم).
-        2. خطة الـ $1,000,000 (خلال 6-8 أشهر).
-        
-        المطلوب:
-        1. تحليل دقيق لوضع الذهب (XAU/USD) بناءً على قواعد الجلسة والتقارب المؤسسي.
-        2. شرح كيف يتوافق الوضع الحالي مع الخطط المالية المذكورة أعلاه.
-        3. حساب درجة FTCS (0-100).
-        4. تقديم مقترحات لصفقات محتملة إذا سمحت الشروط.
-        
-        يجب أن تكون النتيجة بتنسيق JSON حصراً:
+        يجب أن تكون النتيجة بتنسيق JSON:
         {{
           "bias": "BULLISH | BEARISH | NEUTRAL",
           "ftcs_score": 0-100,
-          "reasoning": "التحليل المفصل باللغة العربية شاملاً الخطط والوضع الحالي",
+          "reasoning": "التقرير الكامل المنسق باللغة العربية والرموز الإيموجي",
           "execute": true/false
         }}
         """

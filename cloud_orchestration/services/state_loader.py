@@ -49,9 +49,17 @@ class StateLoader:
 
         # Heuristic for phase extraction
         roadmap = docs_content.get("roadmap", "")
-        if "PHASE 1" in roadmap.upper() and "[x]" not in roadmap:
-            state["phase"] = "PHASE 1 (Foundation)"
-        elif "PHASE 2" in roadmap.upper():
-            state["phase"] = "PHASE 2 (Moonshot)"
+        if "PHASE 5" in roadmap.upper():
+            state["phase"] = "Phase 5: Moonshot Stage"
+        elif "PHASE 1" in roadmap.upper():
+            state["phase"] = "Phase 1: Foundation"
+        else:
+            # Try to find the word 'Phase' followed by a number
+            import re
+            match = re.search(r'Phase\s*\d+', roadmap, re.IGNORECASE)
+            if match:
+                state["phase"] = match.group(0)
+            else:
+                state["phase"] = "Sovereign Operations"
             
         return state
