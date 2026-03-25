@@ -61,6 +61,26 @@ async def get_status():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/webhook/telegram")
+async def telegram_webhook(update: dict, background_tasks: BackgroundTasks):
+    """
+    Handles incoming Telegram commands for on-demand analysis.
+    """
+    message = update.get("message", {})
+    chat_id = str(message.get("chat", {}).get("id", ""))
+    text = message.get("text", "").lower()
+    
+    # Security: Only allow the authorized user
+    if chat_id != os.getenv("TELEGRAM_CHAT_ID"):
+        return {"status": "unauthorized"}
+
+    if "analyze" in text or "تحليل" in text:
+        await telegram.send_alert("⚙️ **جاري بدء التحليل اللحظي بناءً على طلبك...**")
+        background_tasks.add_task(run_analysis_cycle)
+        return {"status": "triggered"}
+    
+    return {"status": "ignored"}
+
 @app.get("/analyze")
 async def trigger_analysis(background_tasks: BackgroundTasks):
     """
