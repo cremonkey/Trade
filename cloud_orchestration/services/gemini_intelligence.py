@@ -82,26 +82,31 @@ class GeminiIntelligence:
         
         prompt = f"""
         (SYSTEM INSTRUCTION): {self.SYSTEM_PROMPT}
-        (SKILLS): {self.skills_base}
-        (KNOWLEDGE): {self.institutional_knowledge}
+        (INSTITUTIONAL SKILLS & KNOWLEDGE): {self.skills_base} {self.institutional_knowledge}
         
-        (DIRECTIVE): Match 'Position Defense Report' and 'Master Intelligence Brief' style.
-        1. العنوان: (Position Defense Report) - [{time_str}]: 🏛️ 🛡️ ⚖️ 🚀
-        2. مقدمة مؤسسية.
-        3. التحليل اللحظي (Tactical Board): ${analysis_context.get('prices', {}).get('XAU/USD')}
-        4. قسم الأخبار الفاصلة 🗞️ 🔥.
-        5. التوجيه المؤسسي: (HOLD | BUY | SELL) 💎.
-        6. المعايير الرقمية: (Entry, SL, TP).
-        7. الأهداف ($5k & $1M).
+        (DIRECTIVE - STEALTH MODE):
+        - DO NOT mention the $5,000 progress or the $1,000,000 goals.
+        - DO NOT include an institutional introduction or objectives.
+        - DO NOT state the numerical criteria or plans.
+        - START directly with the analysis.
+        - ENSURE the suggested trade is at the very end in a sleek, bold layout.
+        
+        (OUTPUT STRUCTURE - ARABIC):
+        1. 🏛️ (Position Defense Report) - [{time_str}]:
+        2. التحليل اللحظي (Tactical Board): ${analysis_context.get('prices', {}).get('XAU/USD')}
+        3. قسم الأخبار الفاصلة 🗞️ 🔥.
+        4. (Suggested Trade Section - SLEEK & BOLD) 💎:
+           - القرار: (HOLD | BUY | SELL)
+           - الدرع (SL):
+           - الهدف (TP):
         
         (LIVE DATA): { {k: v[:2000] for k, v in analysis_context.get('docs', {}).items()} }
         
         OUTPUT ONLY THE FULL ARABIC REPORT IN TEXT FORMAT.
         """
 
-        # Robust Fallback Strategy (Updated per User Feedback on Gemini 2.5/3.0)
         # Advanced High-Tier Candidates (Aligned with your specific API environment)
-        candidates = ["gemini-3.1-pro-preview", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"]
+        candidates = ["gemini-3.1-pro-preview", "gemini-2.5-flash", "gemini-2.5-pro"]
         last_e = ""
         
         for model_name in candidates:
@@ -120,4 +125,4 @@ class GeminiIntelligence:
                 last_e = str(e)
                 continue
 
-        return {"reasoning": f"⚠️ **عطل فني (High-Tier Logic)**: {last_e}", "execute": False}
+        return {"reasoning": f"⚠️ **عطل فني في نظام التحليل**: {last_e}", "execute": False}
