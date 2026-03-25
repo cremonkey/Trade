@@ -1,5 +1,7 @@
 import os
 import httpx
+import asyncio
+from datetime import datetime
 from typing import Dict, Optional
 from dotenv import load_dotenv
 
@@ -23,7 +25,7 @@ class OandaSpotPrices:
 
     async def get_spot(self, base: str, quotes: list) -> Dict:
         """
-        Get real-time spot price via httpx.
+        Get real-time spot price via httpx with timeout.
         """
         params = {
             "base": base,
@@ -32,7 +34,7 @@ class OandaSpotPrices:
             "decimal_places": "5"
         }
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=10.0) as client:
             r = await client.get(
                 f"{self.BASE_URL}/v2/rates/spot.json",
                 headers=self.headers,
@@ -43,7 +45,7 @@ class OandaSpotPrices:
 
     async def get_market_data(self) -> Dict[str, Optional[float]]:
         """
-        Returns spot prices for XAU/USD, XAG/USD, and calculated DXY.
+        Returns spot prices for XAU/USD, XAG/USD, and calculated DXY using parallel fetching.
         """
         prices = {"XAU/USD": 0.0, "XAG/USD": 0.0, "DXY": 0.0}
         
@@ -51,38 +53,43 @@ class OandaSpotPrices:
             return prices
 
         try:
-            # 1. Gold (XAU/USD)
-            gold = await self.get_spot("XAU", ["USD"])
-            prices["XAU/USD"] = float(gold["quotes"][0]["midpoint"])
+            print(f"[{datetime.now()}] OandaAPI: Parallel Scan Initiated...")
             
-            # 2. Silver (XAG/USD)
-            silver = await self.get_spot("XAG", ["USD"])
-            prices["XAG/USD"] = float(silver["quotes"][0]["midpoint"])
+            # Fetch Gold, Silver, and DXY Trigger in parallel
+            task_gold = self.get_spot("XAU", ["USD"])
+            task_silver = self.get_spot("XAG", ["USD"])
+            task_dxy = self._calculate_dxy()
             
-            # 3. DXY Calculation
-            prices["DXY"] = await self._calculate_dxy()
+            gold_res, silver_res, dxy_val = await asyncio.gather(task_gold, task_silver, task_dxy)
+            
+            prices["XAU/USD"] = float(gold_res["quotes"][0]["midpoint"])
+            prices["XAG/USD"] = float(silver_res["quotes"][0]["midpoint"])
+            prices["DXY"] = dxy_val
+            
+            print(f"[{datetime.now()}] OandaAPI: Scan Complete (XAU: {prices['XAU/USD']})")
             
         except Exception as e:
-            print(f"[OandaAPI] Error: {e}")
+            print(f"[{datetime.now()}] OandaAPI: Failure: {e}")
             
         return prices
 
     async def _calculate_dxy(self) -> float:
         """
-        DXY = 50.14348112 x EURUSD^(-0.576) x USDJPY^(0.136) x GBPUSD^(-0.119)
-              x USDCAD^(0.091) x USDSEK^(0.042) x USDCHF^(0.036)
+        Parallel DXY Calculation from Currency Basket.
         """
         try:
-            # Fetch all basket pairs
-            usd_basket = await self.get_spot("USD", ["JPY", "CAD", "SEK", "CHF"])
-            eur = await self.get_spot("EUR", ["USD"])
-            gbp = await self.get_spot("GBP", ["USD"])
+            # Parallel fetch for the basket
+            task_basket = self.get_spot("USD", ["JPY", "CAD", "SEK", "CHF"])
+            task_eur = self.get_spot("EUR", ["USD"])
+            task_gbp = self.get_spot("GBP", ["USD"])
+            
+            basket_res, eur_res, gbp_res = await asyncio.gather(task_basket, task_eur, task_gbp)
             
             # Map values
-            eurusd = float(eur["quotes"][0]["midpoint"])
-            gbpusd = float(gbp["quotes"][0]["midpoint"])
+            eurusd = float(eur_res["quotes"][0]["midpoint"])
+            gbpusd = float(gbp_res["quotes"][0]["midpoint"])
             
-            usd_rates = {q['quote_currency']: float(q['midpoint']) for q in usd_basket['quotes']}
+            usd_rates = {q['quote_currency']: float(q['midpoint']) for q in basket_res['quotes']}
             usdjpy = usd_rates["JPY"]
             usdcad = usd_rates["CAD"]
             usdsek = usd_rates["SEK"]
@@ -99,5 +106,5 @@ class OandaSpotPrices:
             
             return round(dxy, 3)
         except Exception as e:
-            print(f"[OandaAPI] DXY Calc Error: {e}")
+            print(f"[{datetime.now()}] OandaAPI: DXY Error: {e}")
             return 0.0
