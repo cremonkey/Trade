@@ -100,12 +100,13 @@ class GeminiIntelligence:
         """
 
         # Robust Fallback Strategy (Updated per User Feedback on Gemini 2.5/3.0)
-        # Primary candidates per User Feedback (Gemini 2.5/Lite)
-        candidates = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-pro"]
+        # Advanced High-Tier Candidates (Aligned with your specific API environment)
+        candidates = ["gemini-3.1-pro-preview", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"]
         last_e = ""
         
         for model_name in candidates:
             try:
+                # Use standard modelID, Client handles prefixing if needed.
                 response = self.client.models.generate_content(
                     model=model_name,
                     contents=prompt
@@ -119,4 +120,4 @@ class GeminiIntelligence:
                 last_e = str(e)
                 continue
 
-        return {"reasoning": f"⚠️ **عطل فني (2.5 Logic)**: {last_e}", "execute": False}
+        return {"reasoning": f"⚠️ **عطل فني (High-Tier Logic)**: {last_e}", "execute": False}
