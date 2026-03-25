@@ -69,29 +69,36 @@ async def run_analysis_cycle():
     """
     The 15-minute analysis logic.
     """
-    print(f"[{datetime.datetime.now()}] Starting analysis cycle...")
+    print(f"[{datetime.now()}] Starting analysis cycle...")
     
     # 1. Fetch market data
     prices = await twelve_data.get_market_data()
     gold_price = prices.get("XAU/USD")
+    print(f"[{datetime.now()}] Market Data: {prices}")
     
     # 2. Check risk & config
-    config = supabase.get_system_config()
+    try:
+        config = supabase.get_system_config()
+        print(f"[{datetime.now()}] System Config: {config}")
+    except Exception as e:
+        print(f"[{datetime.now()}] Supabase Error: {e}")
+        return
+
     equity = config.get("equity", 88.00)
     lot_size = risk_manager.calculate_lot_size(equity)
     
     # 3. AI Brain Analysis
-    # In a real scenario, news_data would be fetched from news_analyst or an aggregator
-    news_summary = "XAU/USD seeking liquidity at 2150. DXY showing slight weakness."
+    news_summary = "XAU/USD seeking liquidity. Institutional bias evaluation requested."
     ai_decision = await brain.analyze_market(prices, news_summary)
+    print(f"[{datetime.now()}] Brain Decision: {ai_decision}")
     
     ftcs = ai_decision.get("ftcs_score", 0)
     bias = ai_decision.get("bias", "NEUTRAL")
     
-    # 4. Push Alerts if authorized by Brain and Risk
+    # 4. Push Alerts
     if gold_price:
         status_emoji = "✅ EXECUTE" if ai_decision.get("execute") else "⚠️ WATCH"
-        await telegram.send_alert(
+        sent = await telegram.send_alert(
             f"🧠 **Brain Decision**: {status_emoji}\n"
             f"--- \n"
             f"💰 XAU/USD: ${gold_price}\n"
@@ -99,8 +106,11 @@ async def run_analysis_cycle():
             f"🎯 Bias: {bias}\n"
             f"🛡️ Reasoning: {ai_decision.get('reasoning', 'N/A')}"
         )
+        print(f"[{datetime.now()}] Telegram Alert Sent: {sent}")
+    else:
+        print(f"[{datetime.now()}] Skipping Telegram Alert: No Gold Price found.")
     
-    print(f"[{datetime.datetime.now()}] Analysis cycle completed.")
+    print(f"[{datetime.now()}] Analysis cycle completed.")
 
 if __name__ == "__main__":
     import uvicorn
