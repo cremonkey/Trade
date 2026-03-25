@@ -118,8 +118,9 @@ async def run_analysis_cycle():
     # 4. AI Brain Analysis (Directly from Roadmap/Ledger)
     analysis_context = {
         "prices": prices,
-        "ledger": sovereign_state.get("last_ledger_entry"),
-        "roadmap_phase": sovereign_state.get("phase"),
+        "docs": sovereign_state.get("docs", {}),
+        "ledger": sovereign_state.get("last_ledger_entry", {}),
+        "phase": sovereign_state.get("phase", "UNKNOWN"),
         "session": current_session,
         "session_rules": session_rules
     }
