@@ -127,10 +127,10 @@ class GeminiIntelligence:
         }}
         """
 
-        # Model candidates to try
-        candidates = ["gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-pro"]
-        last_error = ""
-
+        # Robust Fallback Strategy (Updated per User Feedback on Gemini 2.5/3.0)
+        candidates = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-1.5-flash-latest"]
+        last_err = ""
+        
         for model_name in candidates:
             try:
                 model = genai.GenerativeModel(model_name)
