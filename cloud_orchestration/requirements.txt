@@ -9,5 +9,3 @@ httpx
 pydantic
 google-genai
 mangum
-tvdatafeed
-pandas
