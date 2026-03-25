@@ -106,10 +106,10 @@ async def run_analysis_cycle():
     current_session = session_manager.get_current_session(datetime.now())
     session_rules = session_manager.get_session_rules(current_session)
     
-    print(f"[{datetime.now()}] --- PHASE 2: VISION SCAN (Market Audit) ---")
+    print(f"[{datetime.now()}] --- PHASE 2: VISION SCAN (Triple-Asset Audit) ---")
     
-    # 2. Vision Scan (Fetch Market Data)
-    prices = await twelve_data.get_market_data()
+    # 2. Vision Scan (Fetch Market Data via Yahoo Finance)
+    prices = await market_data.get_market_data()
     gold_price = prices.get("XAU/USD")
     
     print(f"[{datetime.now()}] --- PHASE 3: NEWS RADAR (Real-time Audit) ---")
