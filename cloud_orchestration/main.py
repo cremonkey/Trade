@@ -107,8 +107,6 @@ async def run_analysis_cycle():
     ai_decision = await brain.analyze_market(analysis_context, "N/A")
     print(f"[{datetime.now()}] Institutional Decision: {ai_decision}")
     
-    # 5. Push Alerts
-    if gold_price:
     # 5. Push Alerts (Arabic & Detailed)
     if gold_price:
         status_emoji = "🛡️ تنفيذ سيادي (EXECUTE)" if ai_decision.get("execute") else "⏳ مراقبة (MONITORING)"
