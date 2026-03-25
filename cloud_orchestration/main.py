@@ -11,6 +11,8 @@ from services.gemini_intelligence import GeminiIntelligence
 from integrations.supabase_client import SupabaseIntegration
 from integrations.telegram_bot import TelegramIntegration
 from integrations.twelve_data import TwelveDataIntegration
+from services.session_manager import SessionManager
+from services.state_loader import StateLoader
 
 app = FastAPI(title="Antigravity Sovereign Cloud")
 
@@ -22,6 +24,8 @@ brain = GeminiIntelligence()
 supabase = SupabaseIntegration()
 telegram = TelegramIntegration()
 twelve_data = TwelveDataIntegration()
+session_manager = SessionManager()
+state_loader = StateLoader()
 
 class AnalysisResult(BaseModel):
     timestamp: str
@@ -71,15 +75,19 @@ async def run_analysis_cycle():
     """
     print(f"[{datetime.now()}] Starting analysis cycle...")
     
-    # 1. Fetch market data
+    # 1. Load Institutional State (Roadmap & Ledger)
+    sovereign_state = state_loader.get_sovereign_state()
+    current_session = session_manager.get_current_session(datetime.now())
+    session_rules = session_manager.get_session_rules(current_session)
+    
+    # 2. Fetch market data
     prices = await twelve_data.get_market_data()
     gold_price = prices.get("XAU/USD")
-    print(f"[{datetime.now()}] Market Data: {prices}")
+    print(f"[{datetime.now()}] Session: {current_session} | Market Data: {prices}")
     
-    # 2. Check risk & config
+    # 3. Check risk & config
     try:
         config = supabase.get_system_config()
-        print(f"[{datetime.now()}] System Config: {config}")
     except Exception as e:
         print(f"[{datetime.now()}] Supabase Error: {e}")
         return
@@ -87,24 +95,30 @@ async def run_analysis_cycle():
     equity = config.get("equity", 88.00)
     lot_size = risk_manager.calculate_lot_size(equity)
     
-    # 3. AI Brain Analysis
-    news_summary = "XAU/USD seeking liquidity. Institutional bias evaluation requested."
-    ai_decision = await brain.analyze_market(prices, news_summary)
-    print(f"[{datetime.now()}] Brain Decision: {ai_decision}")
+    # 4. AI Brain Analysis (Directly from Roadmap/Ledger)
+    analysis_context = {
+        "prices": prices,
+        "ledger": sovereign_state.get("last_ledger_entry"),
+        "roadmap_phase": sovereign_state.get("phase"),
+        "session": current_session,
+        "session_rules": session_rules
+    }
     
-    ftcs = ai_decision.get("ftcs_score", 0)
-    bias = ai_decision.get("bias", "NEUTRAL")
+    ai_decision = await brain.analyze_market(analysis_context, "N/A")
+    print(f"[{datetime.now()}] Institutional Decision: {ai_decision}")
     
-    # 4. Push Alerts
+    # 5. Push Alerts
     if gold_price:
-        status_emoji = "✅ EXECUTE" if ai_decision.get("execute") else "⚠️ WATCH"
+        status_emoji = "🛡️ SOVEREIGN EXECUTE" if ai_decision.get("execute") else "⏳ MONITORING"
         sent = await telegram.send_alert(
-            f"🧠 **Brain Decision**: {status_emoji}\n"
+            f"🏛️ **Institutional Directive**: {status_emoji}\n"
             f"--- \n"
+            f"📈 Phase: {sovereign_state.get('phase')}\n"
+            f"🌍 Session: {current_session}\n"
             f"💰 XAU/USD: ${gold_price}\n"
-            f"📊 FTCS: {ftcs}\n"
-            f"🎯 Bias: {bias}\n"
-            f"🛡️ Reasoning: {ai_decision.get('reasoning', 'N/A')}"
+            f"🎯 Bias: {ai_decision.get('bias', 'NEUTRAL')}\n"
+            f"⚖️ FTCS: {ai_decision.get('ftcs_score', 0)}\n"
+            f"📜 Reasoning: {ai_decision.get('reasoning', 'N/A')}"
         )
         print(f"[{datetime.now()}] Telegram Alert Sent: {sent}")
     else:

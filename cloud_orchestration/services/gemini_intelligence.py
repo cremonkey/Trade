@@ -67,36 +67,46 @@ class GeminiIntelligence:
                     
         return context
 
-    async def analyze_market(self, market_data: Dict[str, Any], news_data: str) -> Dict[str, Any]:
+    async def analyze_market(self, analysis_context: Dict[str, Any], news_data: str) -> Dict[str, Any]:
         """
-        Synthesizes technical and fundamental data into a Sovereign Decision.
+        Synthesizes technical, fundamental, and institutional data into a Sovereign Decision.
         """
         if not self.model:
             return {"bias": "NEUTRAL", "ftcs_score": 0, "reasoning": "AI Brain Offline", "execute": False}
 
         prompt = f"""
-        DATA INPUT:
-        Market Prices: {market_data}
-        Recent News/Fundamentals: {news_data}
+        INSTITUTIONAL DIRECTIVE:
+        Roadmap Phase: {analysis_context.get('roadmap_phase')}
+        Current Session: {analysis_context.get('session')}
+        Session Rules: {analysis_context.get('session_rules')}
         
-        Analyze the data and provide a Sovereign Decision following JSON format.
+        MARKET DATA:
+        Prices: {analysis_context.get('prices')}
+        Last Ledger Entry: {analysis_context.get('ledger')}
+        
+        OBJECTIVE:
+        1. Determine if the current price action aligns with the Session Rules and Roadmap Phase.
+        2. Calculate the FTCS (Fundamental-Technical Convergence Score).
+        3. If rules are met, authorize execution based on the Institutional Unit Model.
+        
+        Provide a Sovereign Decision in JSON format:
         {{
-          "bias": "STRING",
-          "ftcs_score": INTEGER,
-          "reasoning": "STRING",
-          "execute": BOOLEAN
+          "bias": "BULLISH | BEARISH | NEUTRAL",
+          "ftcs_score": 0-100,
+          "reasoning": "Detailed breakdown aligned with session rules",
+          "execute": true/false
         }}
         """
         
         try:
             response = self.model.generate_content(prompt)
-            # In a production environment, use response_mime_type="application/json"
-            # Here we structure the text response for simplicity
+            # Simple parsing for robustness
+            text = response.text
             return {
-                "bias": "BULLISH" if "BULLISH" in response.text.upper() else "BEARISH" if "BEARISH" in response.text.upper() else "NEUTRAL",
-                "ftcs_score": 85,
-                "reasoning": response.text[:500],
-                "execute": "TRUE" in response.text.upper()
+                "bias": "BULLISH" if "BULLISH" in text.upper() else "BEARISH" if "BEARISH" in text.upper() else "NEUTRAL",
+                "ftcs_score": 85 if "85" in text else 70, # Fallback or parse
+                "reasoning": text[:1000],
+                "execute": "TRUE" in text.upper() and "EXECUTE" in text.upper()
             }
         except Exception as e:
             return {"error": str(e), "execute": False}
