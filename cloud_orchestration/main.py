@@ -116,29 +116,6 @@ async def run_analysis_cycle():
     
     print(f"[{datetime.now()}] Analysis cycle completed.")
 
-@app.get("/debug-models")
-async def debug_models():
-    """
-    Lists available Gemini models for diagnostic purposes.
-    """
-    import google.generativeai as genai
-    api_key = os.getenv("GOOGLE_API_KEY", "")
-    if not api_key:
-        return {"error": "No GOOGLE_API_KEY found"}
-    
-    genai.configure(api_key=api_key)
-    try:
-        models = []
-        for m in genai.list_models():
-            models.append({
-                "name": m.name,
-                "version": m.version,
-                "methods": m.supported_generation_methods
-            })
-        return {"available_models": models}
-    except Exception as e:
-        return {"error": str(e)}
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

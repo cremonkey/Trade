@@ -100,7 +100,8 @@ class GeminiIntelligence:
         """
 
         # Robust Fallback Strategy (Updated per User Feedback on Gemini 2.5/3.0)
-        candidates = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-1.5-flash"]
+        # Primary candidates per User Feedback (Gemini 2.5/Lite)
+        candidates = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-pro"]
         last_e = ""
         
         for model_name in candidates:
@@ -118,4 +119,4 @@ class GeminiIntelligence:
                 last_e = str(e)
                 continue
 
-        return {"reasoning": f"⚠️ **عطل فني**: {last_e}", "execute": False}
+        return {"reasoning": f"⚠️ **عطل فني (2.5 Logic)**: {last_e}", "execute": False}
