@@ -1,4 +1,5 @@
 import httpx
+from datetime import datetime
 from typing import Dict, Optional
 
 class YahooFinanceIntegration:
@@ -19,7 +20,7 @@ class YahooFinanceIntegration:
 
     async def get_market_data(self) -> Dict[str, Optional[float]]:
         """
-        Fetches the Triple-Asset Matrix (Gold, Silver, DXY).
+        Fetches the Triple-Asset Matrix (Gold, Silver, DXY) with timeout.
         """
         tickers = ",".join(self.symbols.values())
         url = f"https://query1.finance.yahoo.com/v7/finance/quote?symbols={tickers}"
@@ -31,7 +32,8 @@ class YahooFinanceIntegration:
         }
         
         try:
-            async with httpx.AsyncClient() as client:
+            print(f"[{datetime.now()}] YahooFinance: Initiating Triple-Asset Scan...")
+            async with httpx.AsyncClient(timeout=10.0) as client:
                 response = await client.get(url, headers=self.headers)
                 if response.status_code == 200:
                     data = response.json()
@@ -40,9 +42,10 @@ class YahooFinanceIntegration:
                         for friendly_name, yahoo_symbol in self.symbols.items():
                             if quote.get("symbol") == yahoo_symbol:
                                 results[friendly_name] = round(quote.get("regularMarketPrice", 0.0), 4)
+                    print(f"[{datetime.now()}] YahooFinance: Scan Successful.")
                 else:
-                    print(f"[YahooFinance] HTTP Error {response.status_code}")
+                    print(f"[{datetime.now()}] YahooFinance: HTTP Error {response.status_code}")
         except Exception as e:
-            print(f"[YahooFinance] Error: {e}")
+            print(f"[{datetime.now()}] YahooFinance: Error during scan: {e}")
             
         return results
