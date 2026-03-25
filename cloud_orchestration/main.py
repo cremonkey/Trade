@@ -91,31 +91,33 @@ async def trigger_analysis(background_tasks: BackgroundTasks):
 
 async def run_analysis_cycle():
     """
-    The 15-minute analysis logic.
+    Enforces the 'Sequential Intelligence' Protocol (v5.1):
+    1. Start Analysis (State Load)
+    2. Vision Scan (Market Data Audit)
+    3. News Radar (Fundamental Search)
+    4. Sovereign Result (AI Brain)
     """
-    print(f"[{datetime.now()}] Starting analysis cycle...")
+    print(f"[{datetime.now()}] --- PHASE 1: START ANALYSIS (Institutional Grade) ---")
     
-    # 1. Load Institutional State (Roadmap & Ledger)
+    # 1. Start Analysis (Load Institutional State)
     sovereign_state = state_loader.get_sovereign_state()
     current_session = session_manager.get_current_session(datetime.now())
     session_rules = session_manager.get_session_rules(current_session)
     
-    # 2. Fetch market data
+    print(f"[{datetime.now()}] --- PHASE 2: VISION SCAN (Market Audit) ---")
+    
+    # 2. Vision Scan (Fetch Market Data)
     prices = await twelve_data.get_market_data()
     gold_price = prices.get("XAU/USD")
-    print(f"[{datetime.now()}] Session: {current_session} | Market Data: {prices}")
     
-    # 3. Check risk & config
-    try:
-        config = supabase.get_system_config()
-    except Exception as e:
-        print(f"[{datetime.now()}] Supabase Error: {e}")
-        return
-
-    equity = config.get("equity", 88.00)
-    lot_size = risk_manager.calculate_lot_size(equity)
+    print(f"[{datetime.now()}] --- PHASE 3: NEWS RADAR (Fundamental Search) ---")
     
-    # 4. AI Brain Analysis (Directly from Roadmap/Ledger)
+    # 3. News Radar (Check fundamental context)
+    news_context = sovereign_state.get("docs", {}).get("brief", "No live context found.")
+    
+    # 4. Sovereign AI Brain Decision (Arabic Stealth Mode)
+    print(f"[{datetime.now()}] --- PHASE 4: SOVEREIGN RESULT (AI Synthesis) ---")
+    
     analysis_context = {
         "prices": prices,
         "docs": sovereign_state.get("docs", {}),
@@ -125,17 +127,16 @@ async def run_analysis_cycle():
         "session_rules": session_rules
     }
     
-    ai_decision = await brain.analyze_market(analysis_context, "N/A")
-    print(f"[{datetime.now()}] Institutional Decision: {ai_decision}")
+    ai_decision = await brain.analyze_market(analysis_context, news_context)
     
-    # 5. Push Alerts (Style-Matched Position Defense Report)
+    # 5. Final Output (Style-Matched Position Defense Report)
     if gold_price:
         sent = await telegram.send_alert(ai_decision.get('reasoning', 'N/A'))
-        print(f"[{datetime.now()}] Telegram Alert Sent: {sent}")
+        print(f"[{datetime.now()}] Sequential Intelligence Result Sent: {sent}")
     else:
-        print(f"[{datetime.now()}] Skipping Telegram Alert: No Gold Price found.")
+        print(f"[{datetime.now()}] Sequence Interrupted: Critical Market Data Failure.")
     
-    print(f"[{datetime.now()}] Analysis cycle completed.")
+    print(f"[{datetime.now()}] --- ANALYSIS SEQUENCE COMPLETE ---")
 
 if __name__ == "__main__":
     import uvicorn

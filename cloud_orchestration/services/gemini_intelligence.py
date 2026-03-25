@@ -84,16 +84,19 @@ class GeminiIntelligence:
         (SYSTEM INSTRUCTION): {self.SYSTEM_PROMPT}
         (INSTITUTIONAL SKILLS & KNOWLEDGE): {self.skills_base} {self.institutional_knowledge}
         
+        (SEQUENTIAL PROTOCOL):
+        1. VISION AUDIT: Scan the tactical price levels (${analysis_context.get('prices', {}).get('XAU/USD')}) as a visual chart matrix.
+        2. NEWS RADAR: Integrate the following fundamental intelligence: {news_data}
+        3. SOVEREIGN SYNTHESIS: Generate the report in Stealth Mode.
+        
         (DIRECTIVE - STEALTH MODE):
-        - DO NOT mention the $5,000 progress or the $1,000,000 goals.
-        - DO NOT include an institutional introduction or objectives.
-        - DO NOT state the numerical criteria or plans.
         - START directly with the analysis.
-        - ENSURE the suggested trade is at the very end in a sleek, bold layout.
+        - NO plan/objective mentions. 
+        - suggested trade at the very end in a sleek, bold layout.
         
         (OUTPUT STRUCTURE - ARABIC):
         1. 🏛️ (Position Defense Report) - [{time_str}]:
-        2. التحليل اللحظي (Tactical Board): ${analysis_context.get('prices', {}).get('XAU/USD')}
+        2. التحليل اللحظي (Tactical Board) & (Vision Audit Result).
         3. قسم الأخبار الفاصلة 🗞️ 🔥.
         4. (Suggested Trade Section - SLEEK & BOLD) 💎:
            - القرار: (HOLD | BUY | SELL)
