@@ -1,0 +1,10 @@
+twelve-data
+python-telegram-bot
+supabase
+fastapi
+uvicorn
+python-dotenv
+pytest
+httpx
+pydantic
+google-generativeai
