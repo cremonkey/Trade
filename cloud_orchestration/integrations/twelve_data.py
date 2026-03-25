@@ -40,15 +40,20 @@ class TwelveDataIntegration:
 
     async def get_market_data(self) -> Dict[str, Optional[float]]:
         """
-        Consolidated fetch for XAU/USD and DXY (Free Tier Optimized).
+        Consolidated fetch for XAU/USD, XAG/USD, and DXY/Proxies.
         """
-        # Note: XAG/USD is excluded as it requires a paid Twelve Data plan.
-        # DXY symbol in Twelve Data is often 'DXY' or 'DX-Y.NYB'
-        symbols = ["XAU/USD", "DXY"] 
+        # Try DXY, fallback to USD/JPY as a proxy if DXY is restricted.
+        symbols = ["XAU/USD", "XAG/USD", "DXY", "USD/JPY"] 
         results = {}
         for symbol in symbols:
             try:
-                results[symbol] = await self.get_price(symbol)
+                price = await self.get_price(symbol)
+                results[symbol] = price if price else 0.0
             except Exception:
                 results[symbol] = 0.0
+        
+        # Heuristic Logic for SMT: Ensure we have Silver and a Dollar proxy
+        if not results.get("XAG/USD") or results["XAG/USD"] == 0.0:
+            print("[TwelveData] SMT Alert: Silver price missing or restricted.")
+            
         return results

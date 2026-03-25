@@ -13,6 +13,7 @@ from integrations.telegram_bot import TelegramIntegration
 from integrations.twelve_data import TwelveDataIntegration
 from services.session_manager import SessionManager
 from services.state_loader import StateLoader
+from services.news_radar import NewsRadar
 
 app = FastAPI(title="Antigravity Sovereign Cloud")
 
@@ -26,6 +27,7 @@ telegram = TelegramIntegration()
 twelve_data = TwelveDataIntegration()
 session_manager = SessionManager()
 state_loader = StateLoader()
+news_radar = NewsRadar()
 
 class AnalysisResult(BaseModel):
     timestamp: str
@@ -110,24 +112,28 @@ async def run_analysis_cycle():
     prices = await twelve_data.get_market_data()
     gold_price = prices.get("XAU/USD")
     
-    print(f"[{datetime.now()}] --- PHASE 3: NEWS RADAR (Fundamental Search) ---")
+    print(f"[{datetime.now()}] --- PHASE 3: NEWS RADAR (Real-time Audit) ---")
     
     # 3. News Radar (Check fundamental context)
-    news_context = sovereign_state.get("docs", {}).get("brief", "No live context found.")
+    news_radar_brief = await news_radar.fetch_latest_brief()
+    institutional_brief = sovereign_state.get("docs", {}).get("brief", "No institutional brief found.")
+    
+    combined_news = f"INSTITUTIONAL: {institutional_brief}\nLIVE_RADAR: {news_radar_brief}"
     
     # 4. Sovereign AI Brain Decision (Arabic Stealth Mode)
-    print(f"[{datetime.now()}] --- PHASE 4: SOVEREIGN RESULT (AI Synthesis) ---")
+    print(f"[{datetime.now()}] --- PHASE 4: SOVEREIGN RESULT (Triple-Asset Synthesis) ---")
     
     analysis_context = {
-        "prices": prices,
+        "prices": prices, # Includes XAU, XAG, DXY, USD/JPY
         "docs": sovereign_state.get("docs", {}),
         "ledger": sovereign_state.get("last_ledger_entry", {}),
         "phase": sovereign_state.get("phase", "UNKNOWN"),
         "session": current_session,
-        "session_rules": session_rules
+        "session_rules": session_rules,
+        "vision_status": "Screenshots failed - using API Data Matrix for Vision Audit"
     }
     
-    ai_decision = await brain.analyze_market(analysis_context, news_context)
+    ai_decision = await brain.analyze_market(analysis_context, combined_news)
     
     # 5. Final Output (Style-Matched Position Defense Report)
     if gold_price:
