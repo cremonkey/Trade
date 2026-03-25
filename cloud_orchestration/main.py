@@ -109,16 +109,18 @@ async def run_analysis_cycle():
     
     # 5. Push Alerts
     if gold_price:
-        status_emoji = "🛡️ SOVEREIGN EXECUTE" if ai_decision.get("execute") else "⏳ MONITORING"
+    # 5. Push Alerts (Arabic & Detailed)
+    if gold_price:
+        status_emoji = "🛡️ تنفيذ سيادي (EXECUTE)" if ai_decision.get("execute") else "⏳ مراقبة (MONITORING)"
         sent = await telegram.send_alert(
-            f"🏛️ **Institutional Directive**: {status_emoji}\n"
+            f"🏛️ **القرار المؤسسي**: {status_emoji}\n"
             f"--- \n"
-            f"📈 Phase: {sovereign_state.get('phase')}\n"
-            f"🌍 Session: {current_session}\n"
-            f"💰 XAU/USD: ${gold_price}\n"
-            f"🎯 Bias: {ai_decision.get('bias', 'NEUTRAL')}\n"
-            f"⚖️ FTCS: {ai_decision.get('ftcs_score', 0)}\n"
-            f"📜 Reasoning: {ai_decision.get('reasoning', 'N/A')}"
+            f"📈 المرحلة: {sovereign_state.get('phase')}\n"
+            f"🌍 الجلسة: {current_session}\n"
+            f"💰 سعر الذهب مباشر: ${gold_price}\n"
+            f"🎯 الاتجاه: {ai_decision.get('bias', 'NEUTRAL')}\n"
+            f"⚖️ تقييم التقارب (FTCS): {ai_decision.get('ftcs_score', 0)}\n"
+            f"\n📜 **التحليل التفصيلي**:\n{ai_decision.get('reasoning', 'N/A')}"
         )
         print(f"[{datetime.now()}] Telegram Alert Sent: {sent}")
     else:
